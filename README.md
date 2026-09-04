@@ -191,3 +191,34 @@ cd RaceDay-POE
 | 2026-01-XX | Documentation complete | ✅ |
 
 
+## Development Notes
+
+### Important Design Decisions
+
+1. **Single Users Table**: Uses a Role field instead of separate Organiser/Participant tables to simplify authentication.
+
+2. **Unique Constraints**: 
+   - Email is unique in Users table
+   - Event+Category combination is unique in EventCategories
+   - Participant+EventCategory combination is unique in Enrolments
+
+3. **Cascading Deletes**: When an Event or Category is deleted, related EventCategories are automatically removed (CASCADE).
+
+4. **Status Management**:
+   - Enrolments: Registered → Cancelled/Completed
+   - Results: Pending → Completed/Disqualified
+
+### Future Enhancements
+- Payment processing integration
+- Live weather and route information
+- Participant analytics and insights
+- Automated notifications
+- Mobile application
+
+### Troubleshooting Common Issues
+
+#### Issue: SQL script fails with "database in use"
+**Solution**: Kill existing connections before dropping:
+```sql
+ALTER DATABASE RaceDayDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+DROP DATABASE RaceDayDB;
