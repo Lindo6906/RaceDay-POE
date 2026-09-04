@@ -115,7 +115,13 @@ The SQL script seeds the database with realistic test data:
 **Categories**: 5km, 10km, 21km, 42km, 100km
 
 This data allows immediate testing of all system functionality without needing to create test data manually.
-**File:** `/docs/RaceDay_Database.sql`
+
+## Database Setup Instructions
+
+### Prerequisites
+- SQL Server (Express/Developer/Enterprise)
+- SQL Server Management Studio (SSMS)
+- GitHub account (for cloning)
 
 ---
 
