@@ -134,7 +134,9 @@ The repository includes a GitHub Actions workflow that validates:
 - SQL script file
 - Required tables in the SQL script
 
-**Green Build Screenshot:** `CI-CD-Green-Build.png`
+**Green Build Screenshot:** 
+CI-CD-Green-Build.png
+
 
 ---
 ## Setup Instructions
