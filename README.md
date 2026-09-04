@@ -76,13 +76,22 @@ Enrolments track participation registration, while Results store performance dat
 
 ---
 
-### Database Schema
-The SQL script creates the full database schema with:
-- All CREATE TABLE statements
-- Primary and foreign keys
-- Constraints (NOT NULL, UNIQUE, DEFAULT)
-- Sample data
-- Performance indexes
+### Database Schema Details
+
+| Table | Purpose | Key Fields |
+|-------|---------|------------|
+| Users | Stores all user accounts | UserID, Email, Role |
+| Events | Event information | EventID, OrganiserID, EventDate |
+| Categories | Race distance categories | CategoryID, CategoryName |
+| EventCategories | Links events to categories | EventCategoryID, EventID, CategoryID |
+| Enrolments | Participant registrations | EnrolmentID, ParticipantID, EventCategoryID |
+| Results | Performance results | ResultID, EnrolmentID, FinishTime |
+
+**Key Relationships**:
+- One Organiser → Many Events (1:M)
+- Many Events ↔ Many Categories (M:M via EventCategories)
+- One EventCategory → Many Enrolments (1:M)
+- One Enrolment → One Result (1:1)
 **File:** `/docs/RaceDay_Database.sql`
 
 ---
