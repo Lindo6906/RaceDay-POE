@@ -3,24 +3,24 @@
 ## Overview
 RaceDay is a full-stack web-based event management system designed for the South African road running, walking, and cycling community. Event Organisers can create and manage events, categories, and participant results. Participants can browse upcoming events, enter events, track their personal performance history, and prepare for race day.
 
----
+## System Features
 
-## System Roles
+### For Organisers
+- **Event Management**: Create, edit, and delete running/cycling events
+- **Category Management**: Define race categories (5km, 10km, 21km, 42km, etc.)
+- **Participant Tracking**: View all enrolments for their events
+- **Results Capture**: Record finish times and positions for participants
 
-### Organiser
-- Create, edit, and delete events
-- Manage event categories
-- Capture participant results
-- View all event enrolments
+### For Participants
+- **User Registration**: Create an account with role selection
+- **Event Discovery**: Browse and search upcoming events
+- **Event Registration**: Enrol in events by selecting a category
+- **Performance History**: View personal results across all events
 
-### Participant
-- Create an account
-- Browse events
-- Enter events by selecting a category
-- View their own enrolments
-- Track their personal results
-
----
+### Technical Specifications
+- **Database**: SQL Server with normalized schema
+- **API**: RESTful endpoints with role-based access control
+- **Architecture**: Multi-tier (Database → API → Client)
 
 ## Part 1 - System Planning and Database
 
@@ -35,9 +35,6 @@ RaceDay-POE/
 │   ├── ERD.png
 │   ├── API-Endpoint-Plan.md
 │   └── RaceDay_Database.sql
-├── .github/
-│   └── workflows/
-│       └── validate-docs.yml
 ├── README.md
 └── CI-CD-Green-Build.png
 ```
