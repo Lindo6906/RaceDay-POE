@@ -96,21 +96,11 @@ The repository includes a GitHub Actions workflow that validates:
 **Green Build Screenshot:** `CI-CD-Green-Build.png`
 
 ---
-
-## Video Presentation
-
-Watch the walkthrough of the planning documents:
-
-[YouTube Video Link - Replace YOUR_VIDEO_ID]
-https://www.youtube.com/watch?v=YOUR_VIDEO_ID
-
----
-
 ## Setup Instructions
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/RaceDay-POE.git
+git clone https://github.com/ST10446906/RaceDay-POE.git
 cd RaceDay-POE
 ```
 
@@ -128,7 +118,4 @@ cd RaceDay-POE
 - Database: SQL
 - CI/CD: GitHub Actions
 
----
 
-## Contact
-For questions or support, refer to the documentation or contact the development team.
