@@ -56,6 +56,7 @@ Enrolments track participation registration, while Results store performance dat
 - Participants to enrol before results are available
 - Results to be updated without affecting enrolment status
 - Historical tracking of both registration and performance
+- 
 **File:** `/docs/ERD.png`
 
 ---
@@ -72,6 +73,7 @@ Enrolments track participation registration, while Results store performance dat
 | Enrolments | Registration management | 6 endpoints |
 | Results | Performance tracking | 6 endpoints |
 | **Total** | **Complete RESTful API** | **29 endpoints** |
+
 **File:** `/docs/API-Endpoint-Plan.md`
 
 ---
