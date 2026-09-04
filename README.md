@@ -43,15 +43,19 @@ RaceDay-POE/
 
 ## Documentation
 
-### Entity Relationship Diagram (ERD)
-The ERD includes 6 entities:
-- **Users** - Stores Organisers and Participants
-- **Events** - Event information created by organisers
-- **Categories** - Event categories (5km, 10km, 21km, 42km)
-- **EventCategories** - Junction table linking Events and Categories
-- **Enrolments** - Participant registrations for event categories
-- **Results** - Participant results for events
+### ERD Design Decisions
 
+#### Users Table
+Designed with a single `Users` table containing a `Role` field (Organiser/Participant) rather than separate tables. This simplifies authentication and reduces duplication while maintaining clear role separation.
+
+#### EventCategories Junction
+Uses a junction table to support many-to-many relationships between Events and Categories. This allows an event to offer multiple categories and a category to appear in multiple events.
+
+#### Enrolments & Results Separation
+Enrolments track participation registration, while Results store performance data. This separation allows:
+- Participants to enrol before results are available
+- Results to be updated without affecting enrolment status
+- Historical tracking of both registration and performance
 **File:** `/docs/ERD.png`
 
 ---
