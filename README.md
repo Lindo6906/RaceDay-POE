@@ -159,4 +159,35 @@ cd RaceDay-POE
 - Database: SQL
 - CI/CD: GitHub Actions
 
+  ## Version History
+
+### Part 1 - System Planning (Current)
+- ✅ ERD created with 6+ entities
+- ✅ API endpoint plan with 29 endpoints
+- ✅ SQL database script with schema and sample data
+- ✅ GitHub Actions CI/CD validation workflow
+- ✅ Comprehensive documentation in README
+
+### Part 2 - API Development (Upcoming)
+- Build RESTful API in C#
+- Connect to SQL Server database
+- Implement role-based access control
+- Write unit tests
+
+### Part 3 - MVC Application (Upcoming)
+- Build MVC web application
+- Integrate Azure Blob Storage
+- Containerize with Docker
+
+### Completed Milestones
+
+| Date | Milestone | Status |
+|------|-----------|--------|
+| 2026-01-XX | Repository created | ✅ |
+| 2026-01-XX | ERD designed | ✅ |
+| 2026-01-XX | API endpoints planned | ✅ |
+| 2026-01-XX | Database script written | ✅ |
+| 2026-01-XX | CI/CD configured | ✅ |
+| 2026-01-XX | Documentation complete | ✅ |
+
 
