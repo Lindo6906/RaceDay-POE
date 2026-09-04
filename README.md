@@ -60,15 +60,18 @@ Enrolments track participation registration, while Results store performance dat
 
 ---
 
-### API Endpoint Plan
-The API endpoint plan covers:
-- Authentication (register and login)
-- User Profile management
-- Event CRUD operations
-- Category CRUD operations
-- Event enrolments
-- Results management
+### API Endpoint Categories
 
+| Category | Description | Endpoints |
+|----------|-------------|-----------|
+| Authentication | User registration and login | 2 endpoints |
+| User Management | Profile management | 3 endpoints |
+| Event Management | CRUD operations | 5 endpoints |
+| Category Management | CRUD operations | 5 endpoints |
+| Event Categories | Junction management | 2 endpoints |
+| Enrolments | Registration management | 6 endpoints |
+| Results | Performance tracking | 6 endpoints |
+| **Total** | **Complete RESTful API** | **29 endpoints** |
 **File:** `/docs/API-Endpoint-Plan.md`
 
 ---
@@ -80,7 +83,6 @@ The SQL script creates the full database schema with:
 - Constraints (NOT NULL, UNIQUE, DEFAULT)
 - Sample data
 - Performance indexes
-
 **File:** `/docs/RaceDay_Database.sql`
 
 ---
