@@ -92,6 +92,27 @@ Enrolments track participation registration, while Results store performance dat
 - Many Events ↔ Many Categories (M:M via EventCategories)
 - One EventCategory → Many Enrolments (1:M)
 - One Enrolment → One Result (1:1)
+
+- ### Sample Data Included
+
+The SQL script seeds the database with realistic test data:
+
+**Organisers**:
+1. John Smith - Event organiser
+2. Sarah Johnson - Event organiser
+
+**Participants**:
+1. Thabo Mokoena - Registered for multiple events
+2. Linda Botha - Active participant
+
+**Events**:
+1. Cape Town Cycle Tour - 35,000 capacity
+2. Soweto Marathon - 30,000 capacity
+3. Durban Summer Run - 10,000 capacity
+
+**Categories**: 5km, 10km, 21km, 42km, 100km
+
+This data allows immediate testing of all system functionality without needing to create test data manually.
 **File:** `/docs/RaceDay_Database.sql`
 
 ---
