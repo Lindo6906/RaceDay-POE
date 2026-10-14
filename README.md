@@ -330,9 +330,15 @@ The Part 2 schema follows the Part 1 ERD (`Roles`, `Users`, `Events`, `Categorie
 
 The workflow `.github/workflows/part2-ci.yml` restores, builds and tests the solution on every push.
 
-**Green build screenshot:**
+**Green build screenshots:** every run on `main` after the Part 2 files were added is passing.
 
-![Part 2 green build](docs/CI-Part2-Green-Build.png)
+*Latest runs (#17 – #21):*
+
+![Part 2 green builds – latest runs](docs/CI-Part2-Green-Build.png)
+
+*Runs for the Part 2 upload (#15 – #16) and the earlier README commits:*
+
+![Part 2 green builds – Part 2 upload](docs/CI-Part2-Green-Build-2.png)
 
 ## Video walkthrough
 
@@ -344,18 +350,18 @@ The workflow `.github/workflows/part2-ci.yml` restores, builds and tests the sol
 
 | Part | Status | Scope |
 |------|--------|-------|
-| **Part 1 – System Planning** |  Complete | ERD with 6 entities, 29-endpoint plan, SQL script with sample data, documentation CI workflow |
-| **Part 2 – API Development** |  Complete | C# RESTful API, SQL Server via EF Core, role-based access, Swagger, unit tests, CI |
-| **Part 3 – MVC Application** |  Upcoming | MVC web app, Azure Blob Storage, Docker |
+| **Part 1 – System Planning** | ✅ Complete | ERD with 6 entities, 29-endpoint plan, SQL script with sample data, documentation CI workflow |
+| **Part 2 – API Development** | ✅ Complete | C# RESTful API, SQL Server via EF Core, role-based access, Swagger, unit tests, CI |
+| **Part 3 – MVC Application** | ⏳ Upcoming | MVC web app, Azure Blob Storage, Docker |
 
 ### Completed milestones
 
 | Date | Milestone | Status |
 |------|-----------|--------|
-| 2026-08-04 | Repository created |
-| 2026-09-01 | Part 1 CI/CD configured | 
-| 2026-09-02 | ERD designed |
-| 2026-09-02 | API endpoints planned | 
-| 2026-09-02 | Database script written | 
-| 2026-09-04 | Part 1 documentation complete | 
-| 2026-10-12 | Part 2 API, tests and CI complete | 
+| 2026-08-04 | Repository created | ✅ |
+| 2026-09-01 | Part 1 CI/CD configured | ✅ |
+| 2026-09-02 | ERD designed | ✅ |
+| 2026-09-02 | API endpoints planned | ✅ |
+| 2026-09-02 | Database script written | ✅ |
+| 2026-09-04 | Part 1 documentation complete | ✅ |
+| 2026-10-12 | Part 2 API, tests and CI complete | ✅ |
