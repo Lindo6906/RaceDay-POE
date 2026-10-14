@@ -356,8 +356,8 @@ The workflow `.github/workflows/part2-ci.yml` restores, builds and tests the sol
 
 ### Completed milestones
 
-| Date | Milestone | Status |
-|------|-----------|--------|
+| Date | Milestone |
+|------|-----------|
 | 2026-08-04 | Repository created |
 | 2026-09-01 | Part 1 CI/CD configured | 
 | 2026-09-02 | ERD designed |
