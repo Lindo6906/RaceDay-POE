@@ -141,6 +141,7 @@ The SQL script seeds realistic test data so the system can be tested immediately
 2. Review the documentation in the `/docs` folder.
 3. Open `RaceDay_Database.sql` in SSMS and run it to create the database, tables and sample data.
 4. Use the API endpoint plan as the guide for development.
+    ```
 
 ## Part 1 CI/CD
 
@@ -184,7 +185,6 @@ ALTER DATABASE RaceDayDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 DROP DATABASE RaceDayDB;
 ```
 
----
 
 # Part 2 – RESTful API
 
