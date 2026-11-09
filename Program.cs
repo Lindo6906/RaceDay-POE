@@ -1,62 +1,60 @@
-using System.Reflection;
-using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using RaceDay.Api.Data;
+using RaceDay.Web.Filters;
+using RaceDay.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<RaceDayDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// MVC + global exception filter that turns ApiException into a friendly view.
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<ApiExceptionFilter>();
+});
 
-builder.Services.AddControllers()
-    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
-// Session management: keeps the user's authenticated state and role between requests.
+// Session (lets the Web app remember who is logged in between requests).
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.Name = ".RaceDay.Session";
+    options.Cookie.Name = ".RaceDay.Web.Session";
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+// Typed HttpClient -> ApiService. Forwards cookies and refuses redirects
+// so the API's session cookie survives, and http -> https redirects don't break Docker.
+builder.Services.AddHttpClient<ApiService>(client =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "RaceDay API",
-        Version = "v1",
-        Description = "RESTful API for managing running, walking and cycling events. " +
-                      "Authentication is session (cookie) based: call POST /api/auth/login first, " +
-                      "then the other endpoints can be tried from this page."
-    });
-    var xml = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
-    if (File.Exists(xml)) options.IncludeXmlComments(xml);
+    var baseUrl = builder.Configuration["ApiSettings:BaseUrl"]
+                  ?? throw new InvalidOperationException("ApiSettings:BaseUrl is missing in appsettings.json");
+    client.BaseAddress = new Uri(baseUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    UseCookies = true,
+    CookieContainer = new System.Net.CookieContainer(),
+    AllowAutoRedirect = false
 });
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-// Apply EF Core migrations on start-up (skipped for the in-memory provider used by the tests).
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsDevelopment())
 {
-    var db = scope.ServiceProvider.GetRequiredService<RaceDayDbContext>();
-    if (db.Database.IsRelational())
-    {
-        if (db.Database.GetMigrations().Any()) db.Database.Migrate();
-        else db.Database.EnsureCreated(); // fallback until you add your first migration
-    }
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
-app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "RaceDay API v1"));
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
 
-if (!app.Environment.IsEnvironment("Testing")) app.UseHttpsRedirection();
+// Order matters:
 app.UseSession();
-app.MapControllers();
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
-/// <summary>Exposed so the test project can use WebApplicationFactory&lt;Program&gt;.</summary>
-public partial class Program { }
