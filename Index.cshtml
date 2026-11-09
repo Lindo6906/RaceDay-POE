@@ -1,38 +1,36 @@
-﻿@model List<RaceDay.Web.ViewModels.EventVm>
+﻿@model List<RaceDay.Web.ViewModels.EnrolmentVm>
 @{
-    ViewData["Title"] = "Events";
+    ViewData["Title"] = "My enrolments";
 }
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Events</h1>
-    @if (Context.Session.GetString("WebRole") == "Organiser")
-    {
-        <a class="btn btn-primary" asp-action="Create">Create event</a>
-    }
-</div>
-<div class="mb-3">
-    <a class="btn btn-sm btn-outline-secondary" asp-action="Index">All</a>
-    <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-type="Run">Run</a>
-    <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-type="Walk">Walk</a>
-    <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-type="Cycle">Cycle</a>
-</div>
+<h1>My enrolments</h1>
+@if (TempData["Flash"] is string flash)
+{
+    <div class="alert alert-success">@flash</div>
+}
 @if (Model.Count == 0)
 {
-    <p>No events.</p>
+    <p>You have no enrolments.</p>
 }
 else
 {
-    <table class="table table-striped">
-        <thead><tr><th>Name</th><th>Type</th><th>Date</th><th>Distance</th><th>Location</th><th></th></tr></thead>
+    <table class="table">
+        <thead><tr><th>Event</th><th>Date</th><th>Category</th><th>Status</th><th></th></tr></thead>
         <tbody>
             @foreach (var e in Model)
             {
                 <tr>
-                    <td>@e.Name</td>
-                    <td>@e.EventType</td>
+                    <td>@e.EventName</td>
                     <td>@e.EventDate.ToString("dd MMM yyyy")</td>
-                    <td>@e.DistanceKm km</td>
-                    <td>@e.Location</td>
-                    <td><a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@e.EventId">Details</a></td>
+                    <td>@e.CategoryName</td>
+                    <td>@e.Status</td>
+                    <td>
+                        <form asp-action="Withdraw" method="post" class="d-inline"
+                              onsubmit="return confirm('Withdraw from this event?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@e.EnrolmentId" />
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Withdraw</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
