@@ -1,0 +1,40 @@
+﻿@model List<RaceDay.Web.ViewModels.EventVm>
+@{
+    ViewData["Title"] = "Events";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Events</h1>
+    @if (Context.Session.GetString("WebRole") == "Organiser")
+    {
+        <a class="btn btn-primary" asp-action="Create">Create event</a>
+    }
+</div>
+<div class="mb-3">
+    <a class="btn btn-sm btn-outline-secondary" asp-action="Index">All</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-type="Run">Run</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-type="Walk">Walk</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-type="Cycle">Cycle</a>
+</div>
+@if (Model.Count == 0)
+{
+    <p>No events.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead><tr><th>Name</th><th>Type</th><th>Date</th><th>Distance</th><th>Location</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var e in Model)
+            {
+                <tr>
+                    <td>@e.Name</td>
+                    <td>@e.EventType</td>
+                    <td>@e.EventDate.ToString("dd MMM yyyy")</td>
+                    <td>@e.DistanceKm km</td>
+                    <td>@e.Location</td>
+                    <td><a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@e.EventId">Details</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
