@@ -70,11 +70,7 @@ RaceDay-POE/
 ├── .dockerignore                    # NEW
 ├── CI-CD-Green-Build.png            # Part 1
 └── README.md
-```
 
-> The Part 3 solution is self-contained under `Part3-Web/` so Parts 2 and 3 can be marked independently. `docker-compose.yml` at the root builds both containers.
-
----
 
 # Part 1 – System Planning and Database
 
