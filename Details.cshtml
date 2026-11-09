@@ -1,0 +1,115 @@
+﻿@model RaceDay.Web.ViewModels.EventVm
+@{
+    ViewData["Title"] = Model.Name;
+    var categories = ViewBag.Categories as List<RaceDay.Web.ViewModels.CategoryVm> ?? new();
+    var enrolments = ViewBag.Enrolments as List<RaceDay.Web.ViewModels.EnrolmentVm>;
+    bool isOwner = ViewBag.IsOwner ?? false;
+    string? role = ViewBag.Role as string;
+}
+
+@if (TempData["Flash"] is string flash)
+{
+    <div class="alert alert-success">@flash</div>
+}
+
+<h1>@Model.Name</h1>
+<p class="text-muted">@Model.EventType · @Model.DistanceKm km · @Model.EventDate.ToString("dd MMM yyyy") · @Model.Location</p>
+<p>@Model.Description</p>
+<p><small>Organiser: @Model.OrganiserName</small></p>
+
+@if (isOwner)
+{
+    <div class="mb-3">
+        <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@Model.EventId">Edit</a>
+        <form asp-action="Delete" asp-route-id="@Model.EventId" method="post" class="d-inline"
+              onsubmit="return confirm('Delete this event?');">
+            @Html.AntiForgeryToken()
+            <button class="btn btn-outline-danger" type="submit">Delete</button>
+        </form>
+    </div>
+}
+
+<h2 class="mt-4">Categories</h2>
+@if (categories.Count == 0)
+{
+    <p>No categories yet.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+        @foreach (var c in categories)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@c.Name</span>
+                @if (isOwner)
+                {
+                    <form asp-action="DeleteCategory" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.EventId" />
+                        <input type="hidden" name="categoryId" value="@c.CategoryId" />
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                }
+            </li>
+        }
+    </ul>
+}
+
+@if (isOwner)
+{
+    <form asp-action="AddCategory" method="post" class="row g-2 mb-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.EventId" />
+        <div class="col-auto"><input name="name" class="form-control" placeholder="New category name" required /></div>
+        <div class="col-auto"><button class="btn btn-primary" type="submit">Add category</button></div>
+    </form>
+}
+
+@if (role == "Participant" && categories.Count > 0)
+{
+    <h2 class="mt-4">Enter this event</h2>
+    <form asp-controller="Enrolments" asp-action="Enrol" method="post" class="row g-2 mb-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="eventId" value="@Model.EventId" />
+        <div class="col-auto">
+            <select name="categoryId" class="form-select" required>
+                @foreach (var c in categories)
+                {
+                    <option value="@c.CategoryId">@c.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto"><button class="btn btn-success" type="submit">Enter</button></div>
+    </form>
+}
+
+@if (isOwner && enrolments != null)
+{
+    <h2 class="mt-4">Enrolments</h2>
+    @if (enrolments.Count == 0)
+    {
+        <p>No enrolments yet.</p>
+    }
+    else
+    {
+        <table class="table table-sm">
+            <thead><tr><th>Participant</th><th>Category</th><th>Status</th><th>Enrolled</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var en in enrolments)
+                {
+                    <tr>
+                        <td>@en.ParticipantName</td>
+                        <td>@en.CategoryName</td>
+                        <td>@en.Status</td>
+                        <td>@en.EnrolmentDate.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-controller="Results" asp-action="Capture"
+                               asp-route-enrolmentId="@en.EnrolmentId">Capture result</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}

@@ -1,0 +1,43 @@
+﻿@model RaceDay.Web.ViewModels.RegisterVm
+@{
+    ViewData["Title"] = "Register";
+}
+<h1>Register</h1>
+<div class="row">
+    <form asp-action="Register" method="post" class="col-md-6">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Role" class="form-label"></label>
+            <select asp-for="Role" class="form-select">
+                <option value="Participant">Participant</option>
+                <option value="Organiser">Organiser</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="OrganiserCode" class="form-label">Organiser code (only for Organisers)</label>
+            <input asp-for="OrganiserCode" class="form-control" />
+        </div>
+        <button class="btn btn-primary" type="submit">Register</button>
+        <a class="btn btn-link" asp-action="Login">Back to login</a>
+    </form>
+</div>

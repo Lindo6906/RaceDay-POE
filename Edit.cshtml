@@ -1,0 +1,12 @@
+﻿@model RaceDay.Web.ViewModels.EventFormVm
+@{
+    ViewData["Title"] = "Edit event";
+}
+<h1>Edit event</h1>
+<form asp-action="Edit" method="post" class="col-md-6">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <partial name="_EventForm" model="Model" />
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-link" asp-action="Index">Cancel</a>
+</form>

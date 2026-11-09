@@ -1,0 +1,38 @@
+﻿@model List<RaceDay.Web.ViewModels.EnrolmentVm>
+@{
+    ViewData["Title"] = "My enrolments";
+}
+<h1>My enrolments</h1>
+@if (TempData["Flash"] is string flash)
+{
+    <div class="alert alert-success">@flash</div>
+}
+@if (Model.Count == 0)
+{
+    <p>You have no enrolments.</p>
+}
+else
+{
+    <table class="table">
+        <thead><tr><th>Event</th><th>Date</th><th>Category</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var e in Model)
+            {
+                <tr>
+                    <td>@e.EventName</td>
+                    <td>@e.EventDate.ToString("dd MMM yyyy")</td>
+                    <td>@e.CategoryName</td>
+                    <td>@e.Status</td>
+                    <td>
+                        <form asp-action="Withdraw" method="post" class="d-inline"
+                              onsubmit="return confirm('Withdraw from this event?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@e.EnrolmentId" />
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Withdraw</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

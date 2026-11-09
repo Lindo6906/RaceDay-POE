@@ -1,0 +1,23 @@
+﻿@model RaceDay.Web.ViewModels.LoginVm
+@{
+    ViewData["Title"] = "Log in";
+}
+<h1>Log in</h1>
+<div class="row">
+    <form asp-action="Login" method="post" class="col-md-6">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <button class="btn btn-primary" type="submit">Log in</button>
+        <a class="btn btn-link" asp-action="Register">Register</a>
+    </form>
+</div>
