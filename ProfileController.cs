@@ -1,48 +1,31 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RaceDay.Api.Data;
-using RaceDay.Api.Dtos;
-using RaceDay.Api.Security;
+﻿using Microsoft.AspNetCore.Mvc;
+using RaceDay.Web.Filters;
+using RaceDay.Web.Services;
+using RaceDay.Web.ViewModels;
 
-namespace RaceDay.Api.Controllers;
+namespace RaceDay.Web.Controllers;
 
-/// <summary>View and update the logged-in user's own profile (both roles).</summary>
-[Route("api/profile")]
-[SessionAuthorize]
-public class ProfileController : ApiControllerBase
+public class ProfileController : Controller
 {
-    private readonly RaceDayDbContext _db;
-    public ProfileController(RaceDayDbContext db) => _db = db;
+    private readonly ApiService _api;
+    public ProfileController(ApiService api) => _api = api;
 
-    /// <summary>Get the logged-in user's profile.</summary>
-    /// <response code="200">The profile.</response>
-    /// <response code="401">Not logged in.</response>
-    [HttpGet]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Get()
+    [WebSessionAuthorize]
+    public async Task<IActionResult> Index()
     {
-        var user = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == CurrentUserId);
-        return user is null ? NotFound(new MessageResponse("User not found.")) : Ok(user.ToDto());
+        var profile = await _api.GetProfileAsync();
+        if (profile is null) return RedirectToAction("Login", "Account");
+        return View(new UpdateProfileVm { FullName = profile.FullName, PhoneNumber = profile.PhoneNumber });
     }
 
-    /// <summary>Update the logged-in user's profile details.</summary>
-    /// <response code="200">Profile updated.</response>
-    /// <response code="400">Validation failed.</response>
-    /// <response code="401">Not logged in.</response>
-    [HttpPut]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Update([FromBody] UpdateProfileRequest request)
+    [HttpPost, ValidateAntiForgeryToken]
+    [WebSessionAuthorize]
+    public async Task<IActionResult> Index(UpdateProfileVm vm)
     {
-        var user = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == CurrentUserId);
-        if (user is null) return NotFound(new MessageResponse("User not found."));
-
-        user.FullName = request.FullName.Trim();
-        user.PhoneNumber = request.PhoneNumber;
-        await _db.SaveChangesAsync();
-
-        return Ok(user.ToDto());
+        if (!ModelState.IsValid) return View(vm);
+        var updated = await _api.UpdateProfileAsync(vm);
+        HttpContext.Session.SetString("WebName", updated.FullName);
+        TempData["Flash"] = "Profile updated.";
+        return RedirectToAction(nameof(Index));
     }
 }
