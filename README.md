@@ -9,12 +9,36 @@ RaceDay is a full-stack, web-based event management system for the South African
 
 - [System overview](#system-overview)
 - [Repository structure](#repository-structure)
-- **[Part 1 – System Planning and Database](#part-1--system-planning-and-database)**
-  - [ERD design decisions](#erd-design-decisions) · [API endpoint plan](#api-endpoint-plan) · [Database schema](#database-schema) · [Sample data](#sample-data) · [Database setup](#database-setup) · [CI/CD](#part-1-cicd) · [Notes and troubleshooting](#part-1-notes-and-troubleshooting)
-- **[Part 2 – RESTful API](#part-2--restful-api)**
-  - [Technology](#part-2-technology) · [Roles](#roles) · [Setup and run](#setup-and-run) · [Using Swagger](#using-swagger) · [Unit tests](#unit-tests) · [Design decisions](#part-2-design-decisions) · [Endpoints](#endpoints) · [Database](#part-2-database) · [Differences from Part 1](#differences-from-the-part-1-plan) · [CI/CD](#part-2-cicd) · [Video](#video-walkthrough)
-- **[Part 3 – MVC Web Application](#part-3--mvc-web-application)**
-  - [Technology](#part-3-technology) · [Project structure](#part-3-project-structure) · [Addresses](#part-3-addresses) · [Setup and run (Visual Studio)](#part-3-setup-and-run-visual-studio) · [Run with Docker](#part-3-run-with-docker) · [How the MVC app talks to the API](#part-3-how-the-mvc-app-talks-to-the-api) · [Screens](#part-3-screens) · [Design decisions](#part-3-design-decisions) · [CI/CD](#part-3-cicd) · [Video](#part-3-video) · [Notes and troubleshooting](#part-3-notes-and-troubleshooting)
+- [Part 1 – System Planning and Database](#part-1--system-planning-and-database)
+  - [ERD design decisions](#erd-design-decisions)
+  - [API endpoint plan](#api-endpoint-plan)
+  - [Database schema](#database-schema)
+  - [Sample data](#sample-data)
+  - [Database setup](#database-setup)
+  - [Part 1 CI/CD](#part-1-cicd)
+  - [Part 1 notes and troubleshooting](#part-1-notes-and-troubleshooting)
+- [Part 2 – RESTful API](#part-2--restful-api)
+  - [Part 2 technology](#part-2-technology)
+  - [Roles](#roles)
+  - [Setup and run](#setup-and-run)
+  - [Using Swagger](#using-swagger)
+  - [Unit tests](#unit-tests)
+  - [Part 2 design decisions](#part-2-design-decisions)
+  - [Endpoints](#endpoints)
+  - [Part 2 database](#part-2-database)
+  - [Differences from the Part 1 plan](#differences-from-the-part-1-plan)
+  - [Part 2 CI/CD](#part-2-cicd)
+- [Part 3 – MVC Web Application](#part-3--mvc-web-application)
+  - [Part 3 technology](#part-3-technology)
+  - [Part 3 project structure](#part-3-project-structure)
+  - [Part 3 addresses](#part-3-addresses)
+  - [Part 3 setup and run (Visual Studio)](#part-3-setup-and-run-visual-studio)
+  - [Part 3 run with Docker](#part-3-run-with-docker)
+  - [Part 3 how the MVC app talks to the API](#part-3-how-the-mvc-app-talks-to-the-api)
+  - [Part 3 screens](#part-3-screens)
+  - [Part 3 design decisions](#part-3-design-decisions)
+  - [Part 3 CI/CD](#part-3-cicd)
+  - [Part 3 notes and troubleshooting](#part-3-notes-and-troubleshooting)
 - [Version history](#version-history)
 
 ---
@@ -70,15 +94,17 @@ RaceDay-POE/
 ├── .dockerignore                    # NEW
 ├── CI-CD-Green-Build.png            # Part 1
 └── README.md
+```
 
+---
 
-# Part 1 – System Planning and Database
+## Part 1 – System Planning and Database
 
 Part 1 covers the planning and database design for RaceDay: the ERD, the API endpoint plan, the SQL script with sample data, and a CI workflow that validates the documentation.
 
-## ERD design decisions
+### ERD design decisions
 
-**File:** `/docs/ERD.png`
+**File:** `ERD.png`
 
 | Decision | Reasoning |
 |----------|-----------|
@@ -86,9 +112,9 @@ Part 1 covers the planning and database design for RaceDay: the ERD, the API end
 | **`EventCategories` junction table** | Supports a many-to-many relationship between Events and Categories, so an event can offer several categories and a category can be reused across events. |
 | **Separate `Enrolments` and `Results`** | Participants can enrol before results exist, results can be updated without touching the enrolment, and both registration and performance are tracked historically. |
 
-## API endpoint plan
+### API endpoint plan
 
-**File:** `/docs/API-Endpoint-Plan.md`
+**File:** `API-Endpoint-Plan.md`
 
 | Category | Description | Endpoints |
 |----------|-------------|-----------|
@@ -101,7 +127,7 @@ Part 1 covers the planning and database design for RaceDay: the ERD, the API end
 | Results | Performance tracking | 6 |
 | **Total** | **Complete RESTful API** | **29** |
 
-## Database schema
+### Database schema
 
 | Table | Purpose | Key fields |
 |-------|---------|------------|
@@ -118,7 +144,7 @@ Part 1 covers the planning and database design for RaceDay: the ERD, the API end
 - One EventCategory → many Enrolments (1:M)
 - One Enrolment → one Result (1:1)
 
-## Sample data
+### Sample data
 
 The SQL script seeds realistic test data so the system can be tested immediately:
 
@@ -129,7 +155,7 @@ The SQL script seeds realistic test data so the system can be tested immediately
 | **Events** | Cape Town Cycle Tour (35,000 capacity), Soweto Marathon (30,000), Durban Summer Run (10,000) |
 | **Categories** | 5km, 10km, 21km, 42km, 100km |
 
-## Database setup
+### Database setup
 
 **Prerequisites:** SQL Server (Express, Developer or Enterprise), SQL Server Management Studio (SSMS), and a GitHub account for cloning.
 
@@ -141,9 +167,8 @@ The SQL script seeds realistic test data so the system can be tested immediately
 2. Review the documentation in the `/docs` folder.
 3. Open `RaceDay_Database.sql` in SSMS and run it to create the database, tables and sample data.
 4. Use the API endpoint plan as the guide for development.
-    ```
 
-## Part 1 CI/CD
+### Part 1 CI/CD
 
 A GitHub Actions workflow validates that the repository contains:
 - the `/docs` folder
@@ -156,9 +181,10 @@ A GitHub Actions workflow validates that the repository contains:
 
 ![Part 1 green build](CI-CD-Green-Build.png)
 
-## Part 1 notes and troubleshooting
+### Part 1 notes and troubleshooting
 
-### Design decisions
+#### Design decisions
+
 1. **Single Users table:** a Role field is used instead of separate Organiser and Participant tables.
 2. **Unique constraints:**
    - Email is unique in `Users`
@@ -169,14 +195,15 @@ A GitHub Actions workflow validates that the repository contains:
    - Enrolments: Registered → Cancelled / Completed
    - Results: Pending → Completed / Disqualified
 
-### Future enhancements
+#### Future enhancements
+
 - Payment processing
 - Live weather and route information
 - Participant analytics
 - Automated notifications
 - Mobile application
 
-### Troubleshooting
+#### Troubleshooting
 
 **SQL script fails with "database in use".** Close the existing connections before dropping the database:
 
@@ -185,12 +212,13 @@ ALTER DATABASE RaceDayDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 DROP DATABASE RaceDayDB;
 ```
 
+---
 
-# Part 2 – RESTful API
+## Part 2 – RESTful API
 
 Part 2 turns the Part 1 design into a working RESTful API with authentication, role-based access, documentation and automated tests.
 
-## Part 2 technology
+### Part 2 technology
 
 | Area | Choice |
 |------|--------|
@@ -201,7 +229,7 @@ Part 2 turns the Part 1 design into a working RESTful API with authentication, r
 | Testing | xUnit with `WebApplicationFactory` and the EF Core in-memory provider |
 | CI/CD | GitHub Actions (`.github/workflows/part2-ci.yml`) |
 
-## Roles
+### Roles
 
 | Role | Permissions |
 |------|-------------|
@@ -210,21 +238,21 @@ Part 2 turns the Part 1 design into a working RESTful API with authentication, r
 
 Both roles can register, log in, log out, and view or update their own profile.
 
-## Setup and run
+### Setup and run
 
-### Prerequisites
+#### Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - SQL Server or SQL Server LocalDB (installed with Visual Studio)
 - Visual Studio 2022 (ASP.NET workload) or the `dotnet` CLI
 
-### 1. Clone and open
+#### 1. Clone and open
 ```bash
 git clone https://github.com/Lindo6906/RaceDay-POE.git
 cd RaceDay-POE/Part2-API
 ```
 Open `RaceDay.sln` in Visual Studio, or work from the command line.
 
-### 2. Configure the connection string
+#### 2. Configure the connection string
 Edit `RaceDay.Api/appsettings.json`:
 ```json
 "ConnectionStrings": {
@@ -232,7 +260,7 @@ Edit `RaceDay.Api/appsettings.json`:
 }
 ```
 
-### 3. Create the database (choose **one** option)
+#### 3. Create the database (choose **one** option)
 
 **Option A – EF Core migrations (recommended, Code-First)**
 ```bash
@@ -247,13 +275,13 @@ Run `Part2-API/Database/01_RaceDay_Schema.sql` in SSMS. Do not combine this with
 
 The `Roles` table is seeded with **Organiser (1)** and **Participant (2)**. Optionally run `02_RaceDay_SampleData.sql` after registering an Organiser, and use `03_RaceDay_Verify.sql` to check the data.
 
-### 4. Run the API
+#### 4. Run the API
 ```bash
 dotnet run --project RaceDay.Api
 ```
 or press **F5** in Visual Studio. Swagger opens at `/swagger`.
 
-## Using Swagger
+### Using Swagger
 
 Authentication is cookie based, so no token is needed.
 
@@ -263,7 +291,7 @@ Authentication is cookie based, so no token is needed.
 
 **Status codes used:** `200` OK · `201` Created · `204` No Content · `400` Validation error · `401` Not logged in · `403` Wrong role or not the owner · `404` Not found · `409` Conflict (duplicate or rule violation).
 
-## Unit tests
+### Unit tests
 
 ```bash
 dotnet test RaceDay.sln
@@ -277,7 +305,7 @@ The tests start the real API in memory with the EF Core in-memory provider, so n
 | `EnrolmentTests.cs` | Enrolling, duplicate and invalid enrolments, withdrawing, organiser views |
 | `ResultTests.cs` | Capturing results, role and ownership checks, participant results |
 
-## Part 2 design decisions
+### Part 2 design decisions
 
 | Topic | Decision |
 |-------|----------|
@@ -287,7 +315,7 @@ The tests start the real API in memory with the EF Core in-memory provider, so n
 | **Ownership** | An Organiser can only modify, or view enrolments and results of, events they created. |
 | **Data rules** | One enrolment per participant per event; the category must belong to the event; one result per enrolment; finishing positions are unique within an event. |
 
-## Endpoints
+### Endpoints
 
 | Method | Route | Access | Purpose |
 |--------|-------|--------|---------|
@@ -315,7 +343,7 @@ The tests start the real API in memory with the EF Core in-memory provider, so n
 | GET | `/api/events/{eventId}/results` | Organiser (owner) | Results for one event |
 | GET | `/api/results/my` | Participant | View own results |
 
-## Part 2 database
+### Part 2 database
 
 The Part 2 schema follows the Part 1 ERD (`Roles`, `Users`, `Events`, `Categories`, `Enrolments`, `Results`).
 
@@ -328,7 +356,7 @@ The Part 2 schema follows the Part 1 ERD (`Roles`, `Users`, `Events`, `Categorie
 | Enrolments | EnrolmentId, ParticipantId, CategoryId, EnrolmentDate, Status (unique: ParticipantId + CategoryId) |
 | Results | ResultId, EnrolmentId (unique), FinishTime, Position, Status, RecordedAt |
 
-## Differences from the Part 1 plan
+### Differences from the Part 1 plan
 
 | Area | Part 1 | Part 2 | Reason |
 |------|--------|--------|--------|
@@ -342,7 +370,7 @@ The Part 2 schema follows the Part 1 ERD (`Roles`, `Users`, `Events`, `Categorie
 | Passwords | Placeholder hashes in the sample data | Real PBKDF2 hashes | Sample users cannot log in; register through the API |
 | Total endpoints | 29 planned | 23 implemented | See the changes above |
 
-## Part 2 CI/CD
+### Part 2 CI/CD
 
 The workflow `.github/workflows/part2-ci.yml` restores, builds and tests the solution on every push.
 
@@ -350,21 +378,21 @@ The workflow `.github/workflows/part2-ci.yml` restores, builds and tests the sol
 
 *Latest runs (#17 – #21):*
 
-![Part 2 green builds – latest runs](CI-Part2-Green-Build.png)
+![Part 2 green builds – latest runs](docs/CI-Part2-Green-Build.png)
 
 *Runs for the Part 2 upload (#15 – #16) and the earlier README commits:*
 
-![Part 2 green builds – Part 2 upload](CI-Part2-Green-Build-2.png)
+![Part 2 green builds – Part 2 upload](docs/CI-Part2-Green-Build-2.png)
 
 ---
 
-# Part 3 – MVC Web Application
+## Part 3 – MVC Web Application
 
 Part 3 adds an **ASP.NET Core 8 MVC** front end that talks to the Part 2 API over HTTP. Every feature visible to a user goes through the same REST endpoints the API already exposes — there is no second database, no duplicated business logic, and no direct data access from the Web project. The Web app is a pure client.
 
 The solution can be run two ways: **locally in Visual Studio with Multiple startup projects**, and as a set of **Docker containers** started by a single `docker compose up --build`. Both give you the full login → browse events → enter event → capture result → view results flow.
 
-## Part 3 technology
+### Part 3 technology
 
 | Area | Choice |
 |------|--------|
@@ -375,7 +403,7 @@ The solution can be run two ways: **locally in Visual Studio with Multiple start
 | Containerisation | Multi-stage `Dockerfile` per project; `docker-compose.yml` for SQL Server + API + Web |
 | CI/CD | GitHub Actions (`.github/workflows/part3-ci.yml`) – restore, build, test, and build both Docker images |
 
-## Part 3 project structure
+### Part 3 project structure
 
 `RaceDay.Web` follows the standard MVC layout, with two additions:
 
@@ -401,49 +429,44 @@ RaceDay.Web/
 └── Program.cs          # registers HttpClient + session
 ```
 
-## Part 3 addresses
+### Part 3 addresses
 
-Captured from the console windows when both projects are running (your ports will differ from mine — use your own):
+Captured from the console windows when both projects are running (**your** ports will differ from mine — use your own):
 
 | What | Address |
 |------|---------|
-| **API** (used by the Web app) | `http://localhost:5yyy  /` |
-| **Web** (browser, https) | `https://localhost:7191//` |
-| **Web** (browser, http fallback) | `https://localhost:7191/` |
+| **API** (used by the Web app) | `http://localhost:5100/` |
+| **Web** (browser, https) | `https://localhost:7191/` |
+| **Web** (browser, http fallback) | `http://localhost:5191/` |
 
 The **API's `http://` address** is the one copied into `RaceDay.Web/appsettings.json`:
 
 ```json
 {
   "ApiSettings": {
-    "BaseUrl": "http://localhost:5yyy  /"
+    "BaseUrl": "http://localhost:5100/"
   }
 }
 ```
 
-> ⚠️ **Two things the guide is strict about here:**
-> 1. Use the **API's** address, not the Web app's own. Otherwise `ApiService` calls itself in a loop.
-> 2. Use the **`http://`** variant, not `https://`. The same address must work inside Docker, where there is no trusted dev cert.
-> 3. **Keep the trailing `/`.** Without it, relative URIs like `api/auth/login` resolve incorrectly and `HttpClient` throws `InvalidOperationException: An invalid request URI was provided`.
+### Part 3 setup and run (Visual Studio)
 
-## Part 3 setup and run (Visual Studio)
-
-### Prerequisites
+#### Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - SQL Server or SQL Server LocalDB (already required for Part 2)
 - Visual Studio 2022 with the **ASP.NET and web development** workload
 
-### 1. Clone and open the Part 3 solution
+#### 1. Clone and open the Part 3 solution
 ```bash
 git clone https://github.com/Lindo6906/RaceDay-POE.git
 cd RaceDay-POE/Part3-Web
 ```
 Open `RaceDay.sln` in Visual Studio.
 
-### 2. Configure the API address
+#### 2. Configure the API address
 Edit `RaceDay.Web/appsettings.json` and set `ApiSettings:BaseUrl` to **your** API's `http://` address, with a trailing slash (see above).
 
-### 3. Run both projects together
+#### 3. Run both projects together
 1. In Solution Explorer, **right-click the solution → Configure Startup Projects…**
 2. Select **Multiple startup projects**.
 3. Set:
@@ -457,7 +480,7 @@ Edit `RaceDay.Web/appsettings.json` and set `ApiSettings:BaseUrl` to **your** AP
 
 If the API's `Program.cs` stops at a breakpoint on the first line, press **F5** again to continue.
 
-### 4. Walk through the app
+#### 4. Walk through the app
 1. `/Account/Register` → register a **Participant**.
 2. Register a second user as an **Organiser** (needs the organiser code from `RaceDay.Api/appsettings.json`, default `RACEDAY-ORG-2026`).
 3. As Organiser: **Events → Create event**, then on the event's **Details** page, **Add category** (e.g. `10km`).
@@ -467,7 +490,7 @@ If the API's `Program.cs` stops at a breakpoint on the first line, press **F5** 
 
 If all six steps work, `ApiService` and the API session forwarding are correct.
 
-## Part 3 run with Docker
+### Part 3 run with Docker
 
 The Part 3 root has `docker-compose.yml` that brings up three services on a shared network:
 
@@ -475,7 +498,7 @@ The Part 3 root has `docker-compose.yml` that brings up three services on a shar
 - **`api`** — the Part 2 API in its own container, published on host port **5101**. Reaches SQL at `Server=sql,1433` (the compose service name).
 - **`web`** — the MVC app in its own container, published on host port **5102**. Reaches the API at `ApiSettings__BaseUrl=http://api:8080/` (again, the compose service name).
 
-### Start
+#### Start
 ```bash
 docker compose up --build
 ```
@@ -484,13 +507,13 @@ Then browse to:
 - API Swagger → **`http://localhost:5101/swagger`**
 - MVC app → **`http://localhost:5102`**
 
-### Stop
+#### Stop
 ```bash
 docker compose down          # keep DB data (volume preserved)
 docker compose down -v       # wipe DB data as well
 ```
 
-### Why the container URLs are different from the local ones
+#### Why the container URLs are different from the local ones
 Inside the compose network, service names (`sql`, `api`, `web`) resolve to container IPs on the shared Docker bridge. The containers do not know about your host's `localhost`. That is exactly why:
 
 - `ApiSettings__BaseUrl` inside the `web` container is `http://api:8080/` (the **service name**), not `http://localhost:5101/`.
@@ -499,7 +522,7 @@ Inside the compose network, service names (`sql`, `api`, `web`) resolve to conta
 
 The `__` in environment variable names maps to `:` in .NET configuration, so `ApiSettings__BaseUrl` overrides `ApiSettings:BaseUrl` from `appsettings.json` at runtime. Nothing in the Dockerfiles needs to change between local and container runs.
 
-## Part 3 how the MVC app talks to the API
+### Part 3 how the MVC app talks to the API
 
 - **`Program.cs`** registers a **typed `HttpClient`** for `ApiService`:
   - `BaseAddress` comes from `ApiSettings:BaseUrl`.
@@ -509,7 +532,7 @@ The `__` in environment variable names maps to `:` in .NET configuration, so `Ap
 - **`WebSessionAuthorizeAttribute`** mirrors the API's `[SessionAuthorize]` on the Web side: no `WebUserId` in session → redirect to `/Account/Login`. Role mismatch → `/Account/Denied`. This is a convenience gate only. **The API is still the authority** — if the Web app's session disagrees with the cookie forwarded to the API, the API returns `401`/`403` and `ApiExceptionFilter` renders the shared `ApiError` view.
 - **`ApiExceptionFilter`** catches any unhandled `ApiException` and renders `Views/Shared/ApiError.cshtml` with the API's message and status code, so a `409` "duplicate category" or a `403` "not your event" shows as a friendly page rather than a crash.
 
-## Part 3 screens
+### Part 3 screens
 
 | Route | Controller | Who sees it |
 |-------|------------|-------------|
@@ -528,7 +551,7 @@ The `__` in environment variable names maps to `:` in .NET configuration, so `Ap
 | `/Profile` | `ProfileController.Index` | Any logged-in role |
 | `/Account/Denied` | `AccountController.Denied` | Any role (role mismatch page) |
 
-## Part 3 design decisions
+### Part 3 design decisions
 
 | Topic | Decision |
 |-------|----------|
@@ -539,39 +562,34 @@ The `__` in environment variable names maps to `:` in .NET configuration, so `Ap
 | **HTTPS is disabled inside Docker** | The API binds `http://+:8080` and the Web app reaches it at `http://api:8080/`. The dev-cert workflow is fine on a developer machine and a footgun inside a container. |
 | **`ApiSettings:BaseUrl` requires a trailing `/`** | `HttpClient` resolves relative URIs (like `api/auth/login`) against the base. Without the trailing slash, the last path segment of the base URL is replaced, producing a wrong address. |
 
-## Part 3 CI/CD
+### Part 3 CI/CD
 
 The workflow `.github/workflows/part3-ci.yml` runs on every push. Two jobs:
 
 1. **`build-test`** — restores, builds (`Release`) and runs the xUnit test suite for the whole solution. This re-verifies the API tests from Part 2, plus the Web project now that it exists.
 2. **`docker`** (runs only if `build-test` passes) — builds `RaceDay.Api/Dockerfile` and `RaceDay.Web/Dockerfile` so Dockerfile regressions are caught before a marker runs `docker compose up`.
 
-**Green build screenshot:** `docs/CI-Part3-Green-Build.png`
+**Green build screenshot:** `CI-Part3-Green-Build.png`
 
 ![Part 3 CI green](CI-Part3-Green-Build.png)
 
+### Part 3 notes and troubleshooting
 
-## Part 3 notes and troubleshooting
+#### Known limitations
 
-### Design decisions
-1. **One `ApiService`, one `HttpClient`.** All Web → API traffic goes through it. Adding an endpoint means adding one method here and one controller action — nothing else.
-2. **The Web app's session is advisory.** If the API's cookie and the Web session disagree, the API wins (a `401`/`403` renders the `ApiError` page). This keeps the Web app stateless-ish and reusable.
-3. **`ApiExceptionFilter` is registered globally.** No controller needs to `try/catch` an `ApiException`; the filter renders it consistently.
-4. **Compose service names are the containers' network identity.** `sql` and `api` are Docker DNS names inside the bridge network; `localhost` inside a container is the container itself, not the host. That is why the env-var overrides in `docker-compose.yml` are mandatory.
-
-### Known limitations
 - **No pagination** on the event list — fine for the demo dataset, would need a `?page=` query parameter on `GET /api/events` for production.
 - **No file/image uploads** — the brief does not require event images or profile pictures. (Azure Blob Storage was listed under Part 3 in the original planning; it is out of scope for this brief and noted as a future enhancement.)
 - **No refresh-token flow** — session cookies are sufficient for the assignment; a production system would add refresh tokens or switch to JWT.
 
-### Future enhancements
+#### Future enhancements
+
 - **Azure Blob Storage** for event banners and participant avatars.
 - **Payment integration** for paid event entries.
 - **Email notifications** on enrolment and result capture.
 - **Pagination and filtering** on the events list.
 - **Mobile-friendly PWA** built from the same MVC views.
 
-### Troubleshooting
+#### Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
@@ -600,12 +618,11 @@ The workflow `.github/workflows/part3-ci.yml` runs on every push. Two jobs:
 | Date | Milestone |
 |------|-----------|
 | 2026-08-04 | Repository created |
-| 2026-09-01 | Part 1 CI/CD configured | 
+| 2026-09-01 | Part 1 CI/CD configured |
 | 2026-09-02 | ERD designed |
 | 2026-09-02 | API endpoints planned |
 | 2026-09-02 | Database script written |
 | 2026-09-04 | Part 1 documentation complete |
 | 2026-10-12 | Part 2 API, tests and CI complete |
 | 2026-11-10 | Part 3 MVC project, ApiService, session forwarding, Dockerfiles, docker-compose and Part 3 CI complete |
-
-
+```
