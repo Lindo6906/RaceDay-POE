@@ -1,108 +1,130 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using RaceDay.Web.Filters;
-using RaceDay.Web.Services;
-using RaceDay.Web.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RaceDay.Api.Data;
+using RaceDay.Api.Dtos;
+using RaceDay.Api.Models;
+using RaceDay.Api.Security;
 
-namespace RaceDay.Web.Controllers;
+namespace RaceDay.Api.Controllers;
 
-public class EventsController : Controller
+/// <summary>Browse events (both roles) and manage them (Organiser only).</summary>
+[Route("api/events")]
+[SessionAuthorize]
+public class EventsController : ApiControllerBase
 {
-    private readonly ApiService _api;
-    public EventsController(ApiService api) => _api = api;
+    private readonly RaceDayDbContext _db;
+    public EventsController(RaceDayDbContext db) => _db = db;
 
-    [WebSessionAuthorize]
-    public async Task<IActionResult> Index(string? type)
+    /// <summary>List all events, optionally filtered by type (Run, Walk, Cycle).</summary>
+    /// <response code="200">List of events ordered by date.</response>
+    /// <response code="401">Not logged in.</response>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<EventDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetAll([FromQuery] EventType? type)
     {
-        var events = await _api.GetEventsAsync(type);
-        ViewBag.Type = type;
-        return View(events);
+        var query = _db.Events.Include(e => e.Organiser).AsNoTracking();
+        if (type.HasValue) query = query.Where(e => e.EventType == type.Value);
+
+        var events = await query.OrderBy(e => e.EventDate).ToListAsync();
+        return Ok(events.Select(e => e.ToDto()));
     }
 
-    [WebSessionAuthorize]
-    public async Task<IActionResult> Details(int id)
+    /// <summary>Get a single event by id.</summary>
+    /// <response code="200">The event.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="404">Event does not exist.</response>
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(EventDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(int id)
     {
-        var ev = await _api.GetEventAsync(id);
-        if (ev is null) return NotFound();
-
-        ViewBag.Categories = await _api.GetCategoriesAsync(id);
-        ViewBag.IsOwner = HttpContext.Session.GetInt32("WebUserId") == ev.OrganiserId;
-        ViewBag.Role = HttpContext.Session.GetString("WebRole");
-
-        // Organiser's own view also lists enrolments so they can capture results.
-        if (ViewBag.IsOwner == true)
-            ViewBag.Enrolments = await _api.GetEventEnrolmentsAsync(id);
-
-        return View(ev);
+        var ev = await _db.Events.Include(e => e.Organiser).AsNoTracking().FirstOrDefaultAsync(e => e.EventId == id);
+        return ev is null ? NotFound(new MessageResponse("Event not found.")) : Ok(ev.ToDto());
     }
 
-    [WebSessionAuthorize("Organiser")]
-    public IActionResult Create() => View(new EventFormVm());
-
-    [HttpPost, ValidateAntiForgeryToken]
-    [WebSessionAuthorize("Organiser")]
-    public async Task<IActionResult> Create(EventFormVm vm)
+    /// <summary>Create a new event (Organiser only).</summary>
+    /// <response code="201">Event created.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Caller is not an Organiser.</response>
+    [HttpPost]
+    [SessionAuthorize(UserRole.Organiser)]
+    [ProducesResponseType(typeof(EventDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> Create([FromBody] EventRequest request)
     {
-        if (!ModelState.IsValid) return View(vm);
-        var created = await _api.CreateEventAsync(vm);
-        TempData["Flash"] = $"Event '{created.Name}' created.";
-        return RedirectToAction(nameof(Details), new { id = created.EventId });
+        var ev = new Event { OrganiserId = CurrentUserId };
+        Apply(ev, request);
+        _db.Events.Add(ev);
+        await _db.SaveChangesAsync();
+
+        await _db.Entry(ev).Reference(e => e.Organiser).LoadAsync();
+        return CreatedAtAction(nameof(GetById), new { id = ev.EventId }, ev.ToDto());
     }
 
-    [WebSessionAuthorize("Organiser")]
-    public async Task<IActionResult> Edit(int id)
+    /// <summary>Update one of your own events (Organiser only).</summary>
+    /// <response code="200">Event updated.</response>
+    /// <response code="400">Validation failed.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Caller is not an Organiser, or the event belongs to another Organiser.</response>
+    /// <response code="404">Event does not exist.</response>
+    [HttpPut("{id:int}")]
+    [SessionAuthorize(UserRole.Organiser)]
+    [ProducesResponseType(typeof(EventDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(int id, [FromBody] EventRequest request)
     {
-        var ev = await _api.GetEventAsync(id);
-        if (ev is null) return NotFound();
-        return View(new EventFormVm
-        {
-            Name = ev.Name,
-            Description = ev.Description,
-            EventDate = ev.EventDate,
-            Location = ev.Location,
-            DistanceKm = ev.DistanceKm,
-            EventType = ev.EventType
-        });
+        var ev = await _db.Events.Include(e => e.Organiser).FirstOrDefaultAsync(e => e.EventId == id);
+        if (ev is null) return NotFound(new MessageResponse("Event not found."));
+        if (ev.OrganiserId != CurrentUserId) return Forbidden("You can only modify your own events.");
+
+        Apply(ev, request);
+        await _db.SaveChangesAsync();
+        return Ok(ev.ToDto());
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
-    [WebSessionAuthorize("Organiser")]
-    public async Task<IActionResult> Edit(int id, EventFormVm vm)
-    {
-        if (!ModelState.IsValid) return View(vm);
-        await _api.UpdateEventAsync(id, vm);
-        TempData["Flash"] = "Event updated.";
-        return RedirectToAction(nameof(Details), new { id });
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    [WebSessionAuthorize("Organiser")]
+    /// <summary>Delete one of your own events, including its categories and enrolments (Organiser only).</summary>
+    /// <response code="204">Event deleted.</response>
+    /// <response code="401">Not logged in.</response>
+    /// <response code="403">Caller is not an Organiser, or the event belongs to another Organiser.</response>
+    /// <response code="404">Event does not exist.</response>
+    [HttpDelete("{id:int}")]
+    [SessionAuthorize(UserRole.Organiser)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        await _api.DeleteEventAsync(id);
-        TempData["Flash"] = "Event deleted.";
-        return RedirectToAction(nameof(Index));
+        var ev = await _db.Events.FindAsync(id);
+        if (ev is null) return NotFound(new MessageResponse("Event not found."));
+        if (ev.OrganiserId != CurrentUserId) return Forbidden("You can only delete your own events.");
+
+        // Enrolments reference categories with Restrict, so remove them (and their results, via cascade)
+        // and the categories explicitly before the event itself.
+        var enrolments = await _db.Enrolments.Where(e => e.Category.EventId == id).ToListAsync();
+        var categories = await _db.Categories.Where(c => c.EventId == id).ToListAsync();
+        _db.Enrolments.RemoveRange(enrolments);
+        _db.Categories.RemoveRange(categories);
+        _db.Events.Remove(ev);
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
 
-    // ----- Categories on the details page -----
-
-    [HttpPost, ValidateAntiForgeryToken]
-    [WebSessionAuthorize("Organiser")]
-    public async Task<IActionResult> AddCategory(int id, string name)
+    private static void Apply(Event ev, EventRequest r)
     {
-        if (!string.IsNullOrWhiteSpace(name))
-        {
-            await _api.CreateCategoryAsync(id, name.Trim());
-            TempData["Flash"] = "Category added.";
-        }
-        return RedirectToAction(nameof(Details), new { id });
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    [WebSessionAuthorize("Organiser")]
-    public async Task<IActionResult> DeleteCategory(int id, int categoryId)
-    {
-        await _api.DeleteCategoryAsync(categoryId);
-        TempData["Flash"] = "Category deleted.";
-        return RedirectToAction(nameof(Details), new { id });
+        ev.Name = r.Name.Trim();
+        ev.Description = r.Description.Trim();
+        ev.EventDate = r.EventDate!.Value;
+        ev.Location = r.Location.Trim();
+        ev.DistanceKm = r.DistanceKm;
+        ev.EventType = r.EventType;
     }
 }
